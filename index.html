@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ã·ããããã ã¬ã³ã¿ã«ã­ããã³äºç´</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #fff9f0;
+      color: #333;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #f9a825, #f06292);
+      color: white;
+      text-align: center;
+      padding: 24px 16px;
+    }
+    header h1 { font-size: 22px; margin-bottom: 6px; }
+    header p { font-size: 13px; opacity: 0.9; }
+    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+
+    /* STEP indicator */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+    .step {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #ddd;
+      color: #999;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: bold;
+    }
+    .step.active { background: #f9a825; color: white; }
+    .step.done { background: #4caf50; color: white; }
+    .step-line { width: 40px; height: 2px; background: #ddd; margin: auto; }
+    .step-line.done { background: #4caf50; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card h2 { font-size: 16px; color: #f06292; margin-bottom: 16px; }
+
+    /* Calendar */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .calendar-header button {
+      background: none; border: none;
+      font-size: 20px; cursor: pointer; color: #f9a825;
+      padding: 4px 10px;
+    }
+    .calendar-header span { font-weight: bold; font-size: 16px; }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .day-label { font-size: 11px; color: #999; padding: 4px 0; }
+    .day-label.sun { color: #e53935; }
+    .day-label.sat { color: #1e88e5; }
+    .day {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .day:hover:not(.empty):not(.past):not(.fully-booked) {
+      background: #fff3e0;
+    }
+    .day.empty { cursor: default; }
+    .day.past { color: #ccc; cursor: default; }
+    .day.today { font-weight: bold; color: #f9a825; }
+    .day.selected { background: #f9a825; color: white; border-radius: 50%; }
+    .day.fully-booked { color: #ccc; cursor: default; text-decoration: line-through; }
+    .day.has-booking { position: relative; }
+    .day.has-booking::after {
+      content: '';
+      width: 4px; height: 4px;
+      background: #f06292;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 2px; left: 50%; transform: translateX(-50%);
+    }
+
+    /* Plan selection */
+    .plan-options { display: flex; gap: 12px; }
+    .plan-option {
+      flex: 1;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .plan-option:hover { border-color: #f9a825; }
+    .plan-option.selected { border-color: #f9a825; background: #fff8e1; }
+    .plan-option .plan-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+    .plan-option .plan-time { font-size: 12px; color: #999; margin-bottom: 6px; }
+    .plan-option .plan-price { font-size: 18px; font-weight: bold; color: #f06292; }
+
+    /* Time slots */
+    .time-slots { display: flex; gap: 10px; flex-wrap: wrap; }
+    .time-slot {
+      border: 2px solid #eee;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .time-slot:hover:not(.unavailable) { border-color: #f9a825; }
+    .time-slot.selected { border-color: #f9a825; background: #fff8e1; font-weight: bold; }
+    .time-slot.unavailable { color: #ccc; cursor: default; border-color: #eee; text-decoration: line-through; }
+
+    /* Form */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #f9a825;
+    }
+    .form-group textarea { height: 80px; resize: vertical; }
+
+    /* Summary */
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 14px;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .label { color: #999; }
+    .summary-row .value { font-weight: bold; }
+    .summary-price {
+      text-align: center;
+      margin-top: 12px;
+      padding: 12px;
+      background: #fff8e1;
+      border-radius: 10px;
+    }
+    .summary-price .price-label { font-size: 13px; color: #999; }
+    .summary-price .price-value { font-size: 28px; font-weight: bold; color: #f06292; }
+    .summary-note { font-size: 12px; color: #999; text-align: center; margin-top: 8px; }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f9a825, #f06292);
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    /* Success */
+    .success-icon { text-align: center; font-size: 64px; margin: 20px 0; }
+    .success-title { text-align: center; font-size: 22px; font-weight: bold; color: #4caf50; margin-bottom: 8px; }
+    .success-msg { text-align: center; color: #666; font-size: 14px; line-height: 1.6; }
+
+    /* Notice */
+    .notice {
+      background: #fff3e0;
+      border-left: 4px solid #f9a825;
+      padding: 12px;
+      border-radius: 0 10px 10px 0;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    /* Hidden */
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ð® ã·ããããã</h1>
+  <p>ã¬ã³ã¿ã«ã­ããã³äºç´</p>
+</header>
+
+<div class="container">
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step active" id="step1-dot">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2-dot">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3-dot">3</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step" id="step4-dot">4</div>
+  </div>
+
+  <!-- STEP 1: ã«ã¬ã³ãã¼ -->
+  <div id="step1">
+    <div class="notice">
+      ð ãå¸æã®æ¥ä»ãé¸ãã§ãã ããã<br>
+      âå°ã¯æ¢ã«äºç´ãå¥ã£ã¦ããæ¥ã§ãã
+    </div>
+    <div class="card">
+      <h2>ð æ¥ä»ãé¸ã¶</h2>
+      <div class="calendar-header">
+        <button onclick="changeMonth(-1)">â¹</button>
+        <span id="month-label"></span>
+        <button onclick="changeMonth(1)">âº</button>
+      </div>
+      <div class="calendar-grid" id="calendar"></div>
+    </div>
+    <button class="btn btn-primary" id="btn-step1" onclick="goStep(2)" disabled>æ¬¡ã¸ â</button>
+  </div>
+
+  <!-- STEP 2: ãã©ã³ã»æé -->
+  <div id="step2" class="hidden">
+    <div class="card">
+      <h2>ð ãã©ã³ãé¸ã¶</h2>
+      <div class="plan-options">
+        <div class="plan-option" onclick="selectPlan('half')" id="plan-half">
+          <div class="plan-name">åæ¥</div>
+          <div class="plan-time">4æé</div>
+          <div class="plan-price">Â¥5,000</div>
+        </div>
+        <div class="plan-option" onclick="selectPlan('full')" id="plan-full">
+          <div class="plan-name">1æ¥</div>
+          <div class="plan-time">8æé</div>
+          <div class="plan-price">Â¥10,000</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="time-card" style="display:none">
+      <h2>ð éå§æéãé¸ã¶</h2>
+      <div class="time-slots" id="time-slots"></div>
+    </div>
+    <button class="btn btn-secondary" onclick="goStep(1)">â æ»ã</button>
+    <button class="btn btn-primary" id="btn-step2" onclick="goStep(3)" disabled>æ¬¡ã¸ â</button>
+  </div>
+
+  <!-- STEP 3: ãå®¢ãã¾æå ± -->
+  <div id="step3" class="hidden">
+    <div class="card">
+      <h2>ð¤ ãå®¢ãã¾æå ±</h2>
+      <div class="form-group">
+        <label>ãåå *</label>
+        <input type="text" id="input-name" placeholder="å±±ç° è±å­" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label>é»è©±çªå· *</label>
+        <input type="tel" id="input-phone" placeholder="090-1234-5678" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+        <input type="email" id="input-email" placeholder="example@email.com" oninput="checkStep3()">
+      </div>
+      <div class="form-group">
+        <label>ä½¿ç¨ç®çã»åè</label>
+        <textarea id="input-note" placeholder="ä¾ï¼ãèå­ä½ããæçæå®¤ãªã©"></textarea>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="goStep(2)">â æ»ã</button>
+    <button class="btn btn-primary" id="btn-step3" onclick="goStep(4)" disabled>äºç´åå®¹ãç¢ºèªãã â</button>
+  </div>
+
+  <!-- STEP 4: ç¢ºèª -->
+  <div id="step4" class="hidden">
+    <div class="card">
+      <h2>â äºç´åå®¹ã®ç¢ºèª</h2>
+      <div class="summary-row"><span class="label">æ¥ä»</span><span class="value" id="sum-date"></span></div>
+      <div class="summary-row"><span class="label">ãã©ã³</span><span class="value" id="sum-plan"></span></div>
+      <div class="summary-row"><span class="label">æé</span><span class="value" id="sum-time"></span></div>
+      <div class="summary-row"><span class="label">ãåå</span><span class="value" id="sum-name"></span></div>
+      <div class="summary-row"><span class="label">é»è©±çªå·</span><span class="value" id="sum-phone"></span></div>
+      <div class="summary-row"><span class="label">ã¡ã¼ã«</span><span class="value" id="sum-email"></span></div>
+      <div class="summary-row"><span class="label">åè</span><span class="value" id="sum-note"></span></div>
+      <div class="summary-price">
+        <div class="price-label">ãæ¯æãéé¡ï¼ç¾å°æãï¼</div>
+        <div class="price-value" id="sum-price"></div>
+      </div>
+      <p class="summary-note">ð³ ãå¤©æãã¯ã·ãããããã®åºé ­ã«ã¦ãé³ããã¾ã</p>
+    </div>
+    <button class="btn btn-secondary" onclick="goStep(3)">â æ»ã</button>
+    <button class="btn btn-primary" id="btn-submit" onclick="submitBooking()">äºç´ãç¢ºå®ãã ð®</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="step-success" class="hidden">
+    <div class="card" style="text-align:center; padding: 30px 20px;">
+      <div class="success-icon">ð</div>
+      <div class="success-title">äºç´ãå®äºãã¾ããï¼</div>
+      <p class="success-msg" style="margin-top:12px;">
+        ã·ãããããã¬ã³ã¿ã«ã­ããã³ã®ãäºç´ãããã¨ããããã¾ãã<br><br>
+        ãä¸æãªç¹ã¯ã®ãããã¾ã§ãé£çµ¡ãã ããã<br><br>
+        å½æ¥ã¯æ¥½ããã­ããã³ã¿ã¤ã ããæ¥½ãã¿ãã ããð®
+      </p>
+      <div style="margin-top: 20px; background: #f5f5f5; border-radius: 10px; padding: 14px; text-align:left;">
+        <div class="summary-row"><span class="label">æ¥ä»</span><span class="value" id="suc-date"></span></div>
+        <div class="summary-row"><span class="label">æé</span><span class="value" id="suc-time"></span></div>
+        <div class="summary-row"><span class="label">æé</span><span class="value" id="suc-price"></span></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:20px;" onclick="resetApp()">æ°ããäºç´ããã</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== STATE =====
+let currentMonth, currentYear;
+let selectedDate = null;
+let selectedPlan = null;
+let selectedTime = null;
+let bookings = JSON.parse(localStorage.getItem('kitchen_bookings') || '[]');
+
+const today = new Date();
+today.setHours(0,0,0,0);
+currentMonth = today.getMonth();
+currentYear = today.getFullYear();
+
+// ===== CALENDAR =====
+function renderCalendar() {
+  const label = document.getElementById('month-label');
+  label.textContent = `${currentYear}òºt ${currentMonth + 1}æ`;
+
+  const grid = document.getElementById('calendar');
+  grid.innerHTML = '';
+
+  const dayLabels = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
+  const classes = ['sun','','','','','','sat'];
+  dayLabels.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'day-label ' + classes[i];
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const dateStr = formatDate(date);
+    const el = document.createElement('div');
+    el.textContent = d;
+
+    const isPast = date < today;
+    const isToday = date.getTime() === today.getTime();
+    const isSelected = selectedDate === dateStr;
+    const dayBookings = bookings.filter(b => b.date === dateStr);
+    const isFullyBooked = dayBookings.length >= 2;
+
+    let cls = 'day';
+    if (isPast) cls += ' past';
+    else if (isFullyBooked) cls += ' fully-booked';
+    else {
+      el.onclick = () => selectDate(dateStr);
+      if (dayBookings.length > 0) cls += ' has-booking';
+    }
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+
+    el.className = cls;
+    grid.appendChild(el);
+  }
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  selectedPlan = null;
+  selectedTime = null;
+  document.getElementById('btn-step1').disabled = false;
+  renderCalendar();
+}
+
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  renderCalendar();
+}
+
+function formatDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function formatDateJP(dateStr) {
+  const [y, m, d] = dateStr.split('-');
+  const date = new Date(y, m-1, d);
+  const days = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
+  return `${y}å¹´${parseInt(m)}æ${parseInt(d)}æ¥ï¼${days[date.getDay()]}ï¼`;
+}
+
+// ===== PLAN =====
+function selectPlan(plan) {
+  selectedPlan = plan;
+  selectedTime = null;
+  document.getElementById('plan-half').classList.toggle('selected', plan === 'half');
+  document.getElementById('plan-full').classList.toggle('selected', plan === 'full');
+  renderTimeSlots();
+  document.getElementById('time-card').style.display = 'block';
+  document.getElementById('btn-step2').disabled = true;
+}
+
+function renderTimeSlots() {
+  const container = document.getElementById('time-slots');
+  container.innerHTML = '';
+
+  const dayBookings = bookings.filter(b => b.date === selectedDate);
+  const bookedTimes = dayBookings.map(b => b.startTime);
+
+  let slots = [];
+  if (selectedPlan === 'half') {
+    slots = ['08:00', '09:00', '10:00', '13:00', '14:00'];
+  } else {
+    slots = ['08:00', '09:00', '10:00'];
+  }
+
+  slots.forEach(slot => {
+    const el = document.createElement('div');
+    el.className = 'time-slot';
+    const endHour = parseInt(slot) + (selectedPlan === 'half' ? 4 : 8);
+    el.textContent = `${slot} ã ${String(endHour).padStart(2,'0')}:00`;
+
+    const isUnavailable = bookedTimes.includes(slot);
+    if (isUnavailable) {
+      el.classList.add('unavailable');
+    } else {
+      el.onclick = () => selectTime(slot, el);
+    }
+    container.appendChild(el);
+  });
+}
+
+function selectTime(slot, el) {
+  selectedTime = slot;
+  document.querySelectorAll('.time-slot').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-step2').disabled = false;
+}
+
+// ===== STEPS =====
+function goStep(n) {
+  ['step1','step2','step3','step4','step-success'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('step' + n).classList.remove('hidden');
+
+  // Update dots
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('step' + i + '-dot');
+    dot.className = 'step';
+    if (i < n) dot.classList.add('done');
+    else if (i === n) dot.classList.add('active');
+    if (i < 4) {
+      const line = document.getElementById('line' + i);
+      line.className = 'step-line' + (i < n ? ' done' : '');
+    }
+  }
+
+  if (n === 4) fillSummary();
+}
+
+function checkStep3() {
+  const name = document.getElementById('input-name').value.trim();
+  const phone = document.getElementById('input-phone').value.trim();
+  document.getElementById('btn-step3').disabled = !(name && phone);
+}
+
+function fillSummary() {
+  const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
+  const timeStr = `${selectedTime} ã ${String(endHour).padStart(2,'0')}:00`;
+  const planStr = selectedPlan === 'half' ? 'åæ¥ï¼4æéï¼' : '1æ¥ï¼8æéï¼';
+  const price = selectedPlan === 'half' ? 'Â¥5,000' : 'Â¥10,000';
+
+  document.getElementById('sum-date').textContent = formatDateJP(selectedDate);
+  document.getElementById('sum-plan').textContent = planStr;
+  document.getElementById('sum-time').textContent = timeStr;
+  document.getElementById('sum-name').textContent = document.getElementById('input-name').value;
+  document.getElementById('sum-phone').textContent = document.getElementById('input-phone').value;
+  document.getElementById('sum-email').textContent = document.getElementById('input-email').value || 'ãªã';
+  document.getElementById('sum-note').textContent = document.getElementById('input-note').value || 'ãªã';
+  document.getElementById('sum-price').textContent = price;
+}
+
+// ===== SUBMIT =====
+function submitBooking() {
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'äºç´ä¸­...';
+
+  const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
+  const timeStr = `${selectedTime} ã ${String(endHour).padStart(2,'0')}:00`;
+  const planStr = selectedPlan === 'half' ? 'åæ¥ï¼4æéï¼' : '1æ¥ï¼8æéï¼';
+  const price = selectedPlan === 'half' ? 'Â¥5,000' : 'Â¥10,000';
+
+  const booking = {
+    id: Date.now(),
+    date: selectedDate,
+    plan: selectedPlan,
+    startTime: selectedTime,
+    name: document.getElementById('input-name').value,
+    phone: document.getElementById('input-phone').value,
+    email: document.getElementById('input-email').value,
+    note: document.getElementById('input-note').value,
+    createdAt: new Date().toISOString()
+  };
+
+  bookings.push(booking);
+  localStorage.setItem('kitchen_bookings', JSON.stringify(bookings));
+
+  // Show success
+  document.getElementById('suc-date').textContent = formatDateJP(selectedDate);
+  document.getElementById('suc-time').textContent = timeStr;
+  document.getElementById('suc-price').textContent = price + 'ï¼ç¾å°æãï¼';
+
+  ['step1','step2','step3','step4'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('step-success').classList.remove('hidden');
+
+  // Update all dots to done
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('step' + i + '-dot').className = 'step done';
+    if (i < 4) document.getElementById('line' + i).className = 'step-line done';
+  }
+}
+
+function resetApp() {
+  selectedDate = null;
+  selectedPlan = null;
+  selectedTime = null;
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-phone').value = '';
+  document.getElementById('input-email').value = '';
+  document.getElementById('input-note').value = '';
+  goStep(1);
+  renderCalendar();
+}
+
+// Init
+renderCalendar();
+</script>
+</body>
+</html>
