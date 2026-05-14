@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ã·ããããã ã¬ã³ã¿ã«ã­ããã³äºç´</title>
+  <title>ぷりんやさん レンタルキッチン予約</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -218,8 +218,8 @@
 <body>
 
 <header>
-  <h1>ð® ã·ããããã</h1>
-  <p>ã¬ã³ã¿ã«ã­ããã³äºç´</p>
+  <h1>🍮 ぷりんやさん</h1>
+  <p>レンタルキッチン予約</p>
 </header>
 
 <div class="container">
@@ -235,111 +235,111 @@
     <div class="step" id="step4-dot">4</div>
   </div>
 
-  <!-- STEP 1: ã«ã¬ã³ãã¼ -->
+  <!-- STEP 1: カレンダー -->
   <div id="step1">
     <div class="notice">
-      ð ãå¸æã®æ¥ä»ãé¸ãã§ãã ããã<br>
-      âå°ã¯æ¢ã«äºç´ãå¥ã£ã¦ããæ¥ã§ãã
+      📅 ご希望の日付を選んでください。<br>
+      ●印は既に予約が入っている日です。
     </div>
     <div class="card">
-      <h2>ð æ¥ä»ãé¸ã¶</h2>
+      <h2>📅 日付を選ぶ</h2>
       <div class="calendar-header">
-        <button onclick="changeMonth(-1)">â¹</button>
+        <button onclick="changeMonth(-1)">‹</button>
         <span id="month-label"></span>
-        <button onclick="changeMonth(1)">âº</button>
+        <button onclick="changeMonth(1)">›</button>
       </div>
       <div class="calendar-grid" id="calendar"></div>
     </div>
-    <button class="btn btn-primary" id="btn-step1" onclick="goStep(2)" disabled>æ¬¡ã¸ â</button>
+    <button class="btn btn-primary" id="btn-step1" onclick="goStep(2)" disabled>次へ →</button>
   </div>
 
-  <!-- STEP 2: ãã©ã³ã»æé -->
+  <!-- STEP 2: プラン・時間 -->
   <div id="step2" class="hidden">
     <div class="card">
-      <h2>ð ãã©ã³ãé¸ã¶</h2>
+      <h2>🕐 プランを選ぶ</h2>
       <div class="plan-options">
         <div class="plan-option" onclick="selectPlan('half')" id="plan-half">
-          <div class="plan-name">åæ¥</div>
-          <div class="plan-time">4æé</div>
-          <div class="plan-price">Â¥5,000</div>
+          <div class="plan-name">半日</div>
+          <div class="plan-time">4時間</div>
+          <div class="plan-price">¥5,000</div>
         </div>
         <div class="plan-option" onclick="selectPlan('full')" id="plan-full">
-          <div class="plan-name">1æ¥</div>
-          <div class="plan-time">8æé</div>
-          <div class="plan-price">Â¥10,000</div>
+          <div class="plan-name">1日</div>
+          <div class="plan-time">8時間</div>
+          <div class="plan-price">¥10,000</div>
         </div>
       </div>
     </div>
     <div class="card" id="time-card" style="display:none">
-      <h2>ð éå§æéãé¸ã¶</h2>
+      <h2>🕐 開始時間を選ぶ</h2>
       <div class="time-slots" id="time-slots"></div>
     </div>
-    <button class="btn btn-secondary" onclick="goStep(1)">â æ»ã</button>
-    <button class="btn btn-primary" id="btn-step2" onclick="goStep(3)" disabled>æ¬¡ã¸ â</button>
+    <button class="btn btn-secondary" onclick="goStep(1)">← 戻る</button>
+    <button class="btn btn-primary" id="btn-step2" onclick="goStep(3)" disabled>次へ →</button>
   </div>
 
-  <!-- STEP 3: ãå®¢ãã¾æå ± -->
+  <!-- STEP 3: お客さま情報 -->
   <div id="step3" class="hidden">
     <div class="card">
-      <h2>ð¤ ãå®¢ãã¾æå ±</h2>
+      <h2>👤 お客さま情報</h2>
       <div class="form-group">
-        <label>ãåå *</label>
-        <input type="text" id="input-name" placeholder="å±±ç° è±å­" oninput="checkStep3()">
+        <label>お名前 *</label>
+        <input type="text" id="input-name" placeholder="山田 花子" oninput="checkStep3()">
       </div>
       <div class="form-group">
-        <label>é»è©±çªå· *</label>
+        <label>電話番号 *</label>
         <input type="tel" id="input-phone" placeholder="090-1234-5678" oninput="checkStep3()">
       </div>
       <div class="form-group">
-        <label>ã¡ã¼ã«ã¢ãã¬ã¹</label>
+        <label>メールアドレス</label>
         <input type="email" id="input-email" placeholder="example@email.com" oninput="checkStep3()">
       </div>
       <div class="form-group">
-        <label>ä½¿ç¨ç®çã»åè</label>
-        <textarea id="input-note" placeholder="ä¾ï¼ãèå­ä½ããæçæå®¤ãªã©"></textarea>
+        <label>使用目的・備考</label>
+        <textarea id="input-note" placeholder="例：お菓子作り、料理教室など"></textarea>
       </div>
     </div>
-    <button class="btn btn-secondary" onclick="goStep(2)">â æ»ã</button>
-    <button class="btn btn-primary" id="btn-step3" onclick="goStep(4)" disabled>äºç´åå®¹ãç¢ºèªãã â</button>
+    <button class="btn btn-secondary" onclick="goStep(2)">← 戻る</button>
+    <button class="btn btn-primary" id="btn-step3" onclick="goStep(4)" disabled>予約内容を確認する →</button>
   </div>
 
-  <!-- STEP 4: ç¢ºèª -->
+  <!-- STEP 4: 確認 -->
   <div id="step4" class="hidden">
     <div class="card">
-      <h2>â äºç´åå®¹ã®ç¢ºèª</h2>
-      <div class="summary-row"><span class="label">æ¥ä»</span><span class="value" id="sum-date"></span></div>
-      <div class="summary-row"><span class="label">ãã©ã³</span><span class="value" id="sum-plan"></span></div>
-      <div class="summary-row"><span class="label">æé</span><span class="value" id="sum-time"></span></div>
-      <div class="summary-row"><span class="label">ãåå</span><span class="value" id="sum-name"></span></div>
-      <div class="summary-row"><span class="label">é»è©±çªå·</span><span class="value" id="sum-phone"></span></div>
-      <div class="summary-row"><span class="label">ã¡ã¼ã«</span><span class="value" id="sum-email"></span></div>
-      <div class="summary-row"><span class="label">åè</span><span class="value" id="sum-note"></span></div>
+      <h2>✅ 予約内容の確認</h2>
+      <div class="summary-row"><span class="label">日付</span><span class="value" id="sum-date"></span></div>
+      <div class="summary-row"><span class="label">プラン</span><span class="value" id="sum-plan"></span></div>
+      <div class="summary-row"><span class="label">時間</span><span class="value" id="sum-time"></span></div>
+      <div class="summary-row"><span class="label">お名前</span><span class="value" id="sum-name"></span></div>
+      <div class="summary-row"><span class="label">電話番号</span><span class="value" id="sum-phone"></span></div>
+      <div class="summary-row"><span class="label">メール</span><span class="value" id="sum-email"></span></div>
+      <div class="summary-row"><span class="label">備考</span><span class="value" id="sum-note"></span></div>
       <div class="summary-price">
-        <div class="price-label">ãæ¯æãéé¡ï¼ç¾å°æãï¼</div>
+        <div class="price-label">お支払い金額（現地払い）</div>
         <div class="price-value" id="sum-price"></div>
       </div>
-      <p class="summary-note">ð³ ãå¤©æãã¯ã·ãããããã®åºé ­ã«ã¦ãé³ããã¾ã</p>
+      <p class="summary-note">💳 お天払いはぷりんやさんの店頭にてお音いします</p>
     </div>
-    <button class="btn btn-secondary" onclick="goStep(3)">â æ»ã</button>
-    <button class="btn btn-primary" id="btn-submit" onclick="submitBooking()">äºç´ãç¢ºå®ãã ð®</button>
+    <button class="btn btn-secondary" onclick="goStep(3)">← 戻る</button>
+    <button class="btn btn-primary" id="btn-submit" onclick="submitBooking()">予約を確定する 🍮</button>
   </div>
 
   <!-- SUCCESS -->
   <div id="step-success" class="hidden">
     <div class="card" style="text-align:center; padding: 30px 20px;">
-      <div class="success-icon">ð</div>
-      <div class="success-title">äºç´ãå®äºãã¾ããï¼</div>
+      <div class="success-icon">🎉</div>
+      <div class="success-title">予約が完了しました！</div>
       <p class="success-msg" style="margin-top:12px;">
-        ã·ãããããã¬ã³ã¿ã«ã­ããã³ã®ãäºç´ãããã¨ããããã¾ãã<br><br>
-        ãä¸æãªç¹ã¯ã®ãããã¾ã§ãé£çµ¡ãã ããã<br><br>
-        å½æ¥ã¯æ¥½ããã­ããã³ã¿ã¤ã ããæ¥½ãã¿ãã ããð®
+        ぷりんやさんレンタルキッチンのご予約あよがとうございます。<br><br>
+        ご不明な点はのりさんまでご連絡ください。<br><br>
+        当日は楽しいキッチンタイムをお楽しみください🍮
       </p>
       <div style="margin-top: 20px; background: #f5f5f5; border-radius: 10px; padding: 14px; text-align:left;">
-        <div class="summary-row"><span class="label">æ¥ä»</span><span class="value" id="suc-date"></span></div>
-        <div class="summary-row"><span class="label">æé</span><span class="value" id="suc-time"></span></div>
-        <div class="summary-row"><span class="label">æé</span><span class="value" id="suc-price"></span></div>
+        <div class="summary-row"><span class="label">日付</span><span class="value" id="suc-date"></span></div>
+        <div class="summary-row"><span class="label">時間</span><span class="value" id="suc-time"></span></div>
+        <div class="summary-row"><span class="label">料金</span><span class="value" id="suc-price"></span></div>
       </div>
-      <button class="btn btn-primary" style="margin-top:20px;" onclick="resetApp()">æ°ããäºç´ããã</button>
+      <button class="btn btn-primary" style="margin-top:20px;" onclick="resetApp()">新しい予約をする</button>
     </div>
   </div>
 
@@ -361,12 +361,12 @@ currentYear = today.getFullYear();
 // ===== CALENDAR =====
 function renderCalendar() {
   const label = document.getElementById('month-label');
-  label.textContent = `${currentYear}òºt ${currentMonth + 1}æ`;
+  label.textContent = `${currentYear}�t ${currentMonth + 1}月`;
 
   const grid = document.getElementById('calendar');
   grid.innerHTML = '';
 
-  const dayLabels = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
+  const dayLabels = ['日','月','火','水','木','金','土'];
   const classes = ['sun','','','','','','sat'];
   dayLabels.forEach((d, i) => {
     const el = document.createElement('div');
@@ -433,8 +433,8 @@ function formatDate(date) {
 function formatDateJP(dateStr) {
   const [y, m, d] = dateStr.split('-');
   const date = new Date(y, m-1, d);
-  const days = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
-  return `${y}å¹´${parseInt(m)}æ${parseInt(d)}æ¥ï¼${days[date.getDay()]}ï¼`;
+  const days = ['日','月','火','水','木','金','土'];
+  return `${y}年${parseInt(m)}月${parseInt(d)}日（${days[date.getDay()]}）`;
 }
 
 // ===== PLAN =====
@@ -466,7 +466,7 @@ function renderTimeSlots() {
     const el = document.createElement('div');
     el.className = 'time-slot';
     const endHour = parseInt(slot) + (selectedPlan === 'half' ? 4 : 8);
-    el.textContent = `${slot} ã ${String(endHour).padStart(2,'0')}:00`;
+    el.textContent = `${slot} 〜 ${String(endHour).padStart(2,'0')}:00`;
 
     const isUnavailable = bookedTimes.includes(slot);
     if (isUnavailable) {
@@ -515,17 +515,17 @@ function checkStep3() {
 
 function fillSummary() {
   const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
-  const timeStr = `${selectedTime} ã ${String(endHour).padStart(2,'0')}:00`;
-  const planStr = selectedPlan === 'half' ? 'åæ¥ï¼4æéï¼' : '1æ¥ï¼8æéï¼';
-  const price = selectedPlan === 'half' ? 'Â¥5,000' : 'Â¥10,000';
+  const timeStr = `${selectedTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
+  const planStr = selectedPlan === 'half' ? '半日（4時間）' : '1日（8時間）';
+  const price = selectedPlan === 'half' ? '¥5,000' : '¥10,000';
 
   document.getElementById('sum-date').textContent = formatDateJP(selectedDate);
   document.getElementById('sum-plan').textContent = planStr;
   document.getElementById('sum-time').textContent = timeStr;
   document.getElementById('sum-name').textContent = document.getElementById('input-name').value;
   document.getElementById('sum-phone').textContent = document.getElementById('input-phone').value;
-  document.getElementById('sum-email').textContent = document.getElementById('input-email').value || 'ãªã';
-  document.getElementById('sum-note').textContent = document.getElementById('input-note').value || 'ãªã';
+  document.getElementById('sum-email').textContent = document.getElementById('input-email').value || 'なし';
+  document.getElementById('sum-note').textContent = document.getElementById('input-note').value || 'なし';
   document.getElementById('sum-price').textContent = price;
 }
 
@@ -533,12 +533,12 @@ function fillSummary() {
 function submitBooking() {
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
-  btn.textContent = 'äºç´ä¸­...';
+  btn.textContent = '予約中...';
 
   const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
-  const timeStr = `${selectedTime} ã ${String(endHour).padStart(2,'0')}:00`;
-  const planStr = selectedPlan === 'half' ? 'åæ¥ï¼4æéï¼' : '1æ¥ï¼8æéï¼';
-  const price = selectedPlan === 'half' ? 'Â¥5,000' : 'Â¥10,000';
+  const timeStr = `${selectedTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
+  const planStr = selectedPlan === 'half' ? '半日（4時間）' : '1日（8時間）';
+  const price = selectedPlan === 'half' ? '¥5,000' : '¥10,000';
 
   const booking = {
     id: Date.now(),
@@ -558,7 +558,7 @@ function submitBooking() {
   // Show success
   document.getElementById('suc-date').textContent = formatDateJP(selectedDate);
   document.getElementById('suc-time').textContent = timeStr;
-  document.getElementById('suc-price').textContent = price + 'ï¼ç¾å°æãï¼';
+  document.getElementById('suc-price').textContent = price + '（現地払い）';
 
   ['step1','step2','step3','step4'].forEach(id => document.getElementById(id).classList.add('hidden'));
   document.getElementById('step-success').classList.remove('hidden');
