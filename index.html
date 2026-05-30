@@ -398,12 +398,12 @@
         <div class="plan-option" onclick="selectPlan('half')" id="plan-half">
           <div class="plan-name">半日</div>
           <div class="plan-time">4時間</div>
-          <div class="plan-price">¥5,000</div>
+          <div class="plan-price">¥4,000</div>
         </div>
         <div class="plan-option" onclick="selectPlan('full')" id="plan-full">
           <div class="plan-name">1日</div>
           <div class="plan-time">8時間</div>
-          <div class="plan-price">¥10,000</div>
+          <div class="plan-price">¥8,000</div>
         </div>
       </div>
     </div>
@@ -654,7 +654,7 @@ function fillSummary() {
   const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
   const timeStr = `${selectedTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
   const planStr = selectedPlan === 'half' ? '半日（4時間）' : '1日（8時間）';
-  const price = selectedPlan === 'half' ? '¥5,000' : '¥10,000';
+  const price = selectedPlan === 'half' ? '¥4,000' : '¥8,000';
 
   document.getElementById('sum-date').textContent = formatDateJP(selectedDate);
   document.getElementById('sum-plan').textContent = planStr;
@@ -675,7 +675,7 @@ function submitBooking() {
   const endHour = parseInt(selectedTime) + (selectedPlan === 'half' ? 4 : 8);
   const timeStr = `${selectedTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
   const planStr = selectedPlan === 'half' ? '半日（4時間）' : '1日（8時間）';
-  const price = selectedPlan === 'half' ? '¥5,000' : '¥10,000';
+  const price = selectedPlan === 'half' ? '¥4,000' : '¥8,000';
 
   const booking = {
     id: Date.now(),
