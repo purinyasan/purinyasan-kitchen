@@ -724,16 +724,26 @@ function renderTimeSlots() {
   const container = document.getElementById('time-slots');
   container.innerHTML = '';
   const dayBookings = bookings.filter(b => b.date === selectedDate);
-  const bookedTimes = dayBookings.map(b => b.startTime);
+  const duration = selectedPlan === 'half' ? 4 : 8;
   let slots = selectedPlan === 'half'
     ? ['08:00', '09:00', '10:00', '13:00', '14:00']
     : ['08:00', '09:00', '10:00'];
   slots.forEach(slot => {
     const el = document.createElement('div');
     el.className = 'time-slot';
-    const endHour = parseInt(slot) + (selectedPlan === 'half' ? 4 : 8);
+    const startHour = parseInt(slot);
+    const endHour = startHour + duration;
     el.textContent = `${slot} 〜 ${String(endHour).padStart(2,'0')}:00`;
-    if (bookedTimes.includes(slot)) {
+
+    // 既存予約との時間重複チェック
+    const hasConflict = dayBookings.some(b => {
+      const existStart = parseInt(b.startTime);
+      const existEnd = existStart + (b.plan === 'half' ? 4 : 8);
+      // 新しい枠の時間帯が既存予約と1分でも被ればNG
+      return startHour < existEnd && endHour > existStart;
+    });
+
+    if (hasConflict) {
       el.classList.add('unavailable');
     } else {
       el.onclick = () => selectTime(slot, el);
