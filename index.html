@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ぷりんやさん レンタルキッチン予約</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
       background: #fff9f0;
       color: #333;
       min-height: 100vh;
@@ -16,33 +17,100 @@
       background: linear-gradient(135deg, #f9a825, #f06292);
       color: white;
       text-align: center;
-      padding: 24px 16px;
+      padding: 28px 16px 20px;
     }
-    header h1 { font-size: 22px; margin-bottom: 6px; }
+    header h1 { font-size: 24px; margin-bottom: 6px; }
     header p { font-size: 13px; opacity: 0.9; }
-    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+    .container { max-width: 520px; margin: 0 auto; padding: 20px 16px; }
 
-    /* STEP indicator */
+    /* ===== LANDING SECTION ===== */
+    .landing { max-width: 520px; margin: 0 auto; padding: 20px 16px 0; }
+
+    /* Pricing */
+    .pricing-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .pricing-card h2 { font-size: 16px; color: #f06292; margin-bottom: 14px; }
+    .pricing-table { width: 100%; border-collapse: collapse; }
+    .pricing-table tr { border-bottom: 1px solid #f5f5f5; }
+    .pricing-table tr:last-child { border-bottom: none; }
+    .pricing-table td { padding: 12px 8px; font-size: 15px; }
+    .pricing-table td:first-child { color: #555; }
+    .pricing-table td:last-child {
+      text-align: right;
+      font-weight: bold;
+      font-size: 20px;
+      color: #f06292;
+    }
+    .pricing-note {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f5f5f5;
+      line-height: 1.6;
+    }
+
+    /* Map */
+    .map-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .map-card h2 { font-size: 16px; color: #f06292; margin-bottom: 10px; }
+    .map-address {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .map-address strong { color: #333; font-size: 14px; }
+    .map-frame {
+      width: 100%;
+      height: 220px;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .map-link {
+      display: inline-block;
+      color: #f9a825;
+      font-size: 13px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .map-link:hover { text-decoration: underline; }
+
+    /* ===== STEP indicator ===== */
     .steps {
       display: flex;
       justify-content: center;
-      gap: 8px;
+      align-items: center;
+      gap: 6px;
       margin: 20px 0;
     }
     .step {
-      width: 32px; height: 32px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       background: #ddd;
       color: #999;
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; font-weight: bold;
+      flex-shrink: 0;
     }
     .step.active { background: #f9a825; color: white; }
     .step.done { background: #4caf50; color: white; }
-    .step-line { width: 40px; height: 2px; background: #ddd; margin: auto; }
+    .step-line { flex: 1; max-width: 36px; height: 2px; background: #ddd; }
     .step-line.done { background: #4caf50; }
 
-    /* Cards */
+    /* ===== Cards ===== */
     .card {
       background: white;
       border-radius: 16px;
@@ -52,7 +120,7 @@
     }
     .card h2 { font-size: 16px; color: #f06292; margin-bottom: 16px; }
 
-    /* Calendar */
+    /* ===== Calendar ===== */
     .calendar-header {
       display: flex;
       justify-content: space-between;
@@ -61,9 +129,12 @@
     }
     .calendar-header button {
       background: none; border: none;
-      font-size: 20px; cursor: pointer; color: #f9a825;
-      padding: 4px 10px;
+      font-size: 22px; cursor: pointer; color: #f9a825;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: background 0.2s;
     }
+    .calendar-header button:hover { background: #fff3e0; }
     .calendar-header span { font-weight: bold; font-size: 16px; }
     .calendar-grid {
       display: grid;
@@ -82,13 +153,11 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .day:hover:not(.empty):not(.past):not(.fully-booked) {
-      background: #fff3e0;
-    }
+    .day:hover:not(.empty):not(.past):not(.fully-booked) { background: #fff3e0; }
     .day.empty { cursor: default; }
     .day.past { color: #ccc; cursor: default; }
     .day.today { font-weight: bold; color: #f9a825; }
-    .day.selected { background: #f9a825; color: white; border-radius: 50%; }
+    .day.selected { background: #f9a825; color: white; }
     .day.fully-booked { color: #ccc; cursor: default; text-decoration: line-through; }
     .day.has-booking { position: relative; }
     .day.has-booking::after {
@@ -100,7 +169,7 @@
       bottom: 2px; left: 50%; transform: translateX(-50%);
     }
 
-    /* Plan selection */
+    /* ===== Plan ===== */
     .plan-options { display: flex; gap: 12px; }
     .plan-option {
       flex: 1;
@@ -115,9 +184,9 @@
     .plan-option.selected { border-color: #f9a825; background: #fff8e1; }
     .plan-option .plan-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
     .plan-option .plan-time { font-size: 12px; color: #999; margin-bottom: 6px; }
-    .plan-option .plan-price { font-size: 18px; font-weight: bold; color: #f06292; }
+    .plan-option .plan-price { font-size: 20px; font-weight: bold; color: #f06292; }
 
-    /* Time slots */
+    /* ===== Time slots ===== */
     .time-slots { display: flex; gap: 10px; flex-wrap: wrap; }
     .time-slot {
       border: 2px solid #eee;
@@ -131,14 +200,14 @@
     .time-slot.selected { border-color: #f9a825; background: #fff8e1; font-weight: bold; }
     .time-slot.unavailable { color: #ccc; cursor: default; border-color: #eee; text-decoration: line-through; }
 
-    /* Form */
+    /* ===== Form ===== */
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
     .form-group input, .form-group textarea {
       width: 100%;
       border: 2px solid #eee;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       font-size: 15px;
       transition: border-color 0.2s;
       font-family: inherit;
@@ -149,7 +218,7 @@
     }
     .form-group textarea { height: 80px; resize: vertical; }
 
-    /* Summary */
+    /* ===== Summary ===== */
     .summary-row {
       display: flex;
       justify-content: space-between;
@@ -171,7 +240,7 @@
     .summary-price .price-value { font-size: 28px; font-weight: bold; color: #f06292; }
     .summary-note { font-size: 12px; color: #999; text-align: center; margin-top: 8px; }
 
-    /* Buttons */
+    /* ===== Buttons ===== */
     .btn {
       width: 100%;
       padding: 16px;
@@ -194,12 +263,12 @@
       margin-bottom: 10px;
     }
 
-    /* Success */
+    /* ===== Success ===== */
     .success-icon { text-align: center; font-size: 64px; margin: 20px 0; }
     .success-title { text-align: center; font-size: 22px; font-weight: bold; color: #4caf50; margin-bottom: 8px; }
-    .success-msg { text-align: center; color: #666; font-size: 14px; line-height: 1.6; }
+    .success-msg { text-align: center; color: #666; font-size: 14px; line-height: 1.8; }
 
-    /* Notice */
+    /* ===== Notice ===== */
     .notice {
       background: #fff3e0;
       border-left: 4px solid #f9a825;
@@ -211,14 +280,10 @@
       line-height: 1.6;
     }
 
-    /* Hidden */
-    .hidden { display: none; }
-
-    /* Gallery */
+    /* ===== Gallery ===== */
     .gallery-section {
       background: white;
       padding: 24px 16px;
-      margin-bottom: 0;
     }
     .gallery-section h2 {
       text-align: center;
@@ -236,7 +301,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      max-width: 480px;
+      max-width: 520px;
       margin: 0 auto;
     }
     .gallery-item {
@@ -247,19 +312,15 @@
       transition: transform 0.2s;
     }
     .gallery-item:hover { transform: scale(1.02); }
-    .gallery-item.wide {
-      grid-column: span 2;
-    }
+    .gallery-item.wide { grid-column: span 2; }
     .gallery-item img {
       width: 100%;
-      height: 180px;
+      height: 170px;
       object-fit: cover;
       display: block;
       image-orientation: from-image;
     }
-    .gallery-item.wide img {
-      height: 220px;
-    }
+    .gallery-item.wide img { height: 220px; }
     .gallery-caption {
       background: rgba(0,0,0,0.55);
       color: white;
@@ -268,7 +329,7 @@
       text-align: center;
     }
 
-    /* Lightbox */
+    /* ===== Lightbox ===== */
     .lightbox {
       display: none;
       position: fixed;
@@ -278,6 +339,7 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
+      padding: 20px;
     }
     .lightbox.open { display: flex; }
     .lightbox img {
@@ -286,29 +348,88 @@
       border-radius: 12px;
       image-orientation: from-image;
     }
-    .lightbox-caption {
-      color: white;
-      font-size: 14px;
-      margin-top: 12px;
-    }
+    .lightbox-caption { color: white; font-size: 14px; margin-top: 12px; text-align: center; }
     .lightbox-close {
       position: absolute;
       top: 16px; right: 20px;
-      font-size: 32px;
+      font-size: 36px;
       color: white;
       cursor: pointer;
       line-height: 1;
+    }
+
+    /* ===== Admin link ===== */
+    .admin-link {
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: #ccc;
+    }
+    .admin-link a { color: #ccc; text-decoration: none; }
+    .admin-link a:hover { color: #999; }
+
+    /* ===== Hidden ===== */
+    .hidden { display: none; }
+
+    /* ===== Mobile tweaks ===== */
+    @media (max-width: 400px) {
+      header h1 { font-size: 20px; }
+      .plan-options { flex-direction: column; }
+      .plan-option .plan-price { font-size: 18px; }
+      .time-slot { padding: 8px 12px; font-size: 13px; }
+      .gallery-item img { height: 130px; }
+      .gallery-item.wide img { height: 180px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🍮 ぷりんやさん</h1>
-  <p>レンタルキッチン予約</p>
+  <h1>🍮 ぷりんやさん レンタルキッチン</h1>
+  <p>本格プロ仕様キッチンをご利用いただけます</p>
 </header>
 
-<!-- ギャラリーセクション -->
+<!-- 料金 & マップ -->
+<div class="landing">
+
+  <div class="pricing-card" style="margin-top:20px;">
+    <h2>💰 ご利用料金</h2>
+    <table class="pricing-table">
+      <tr>
+        <td>🕐 半日（4時間）</td>
+        <td>¥4,000</td>
+      </tr>
+      <tr>
+        <td>🕗 1日（8時間）</td>
+        <td>¥8,000</td>
+      </tr>
+    </table>
+    <p class="pricing-note">
+      💳 現金・PayPay・d払い・au PAY 対応<br>
+      お支払いは店頭の料金箱にてお願いします
+    </p>
+  </div>
+
+  <div class="map-card">
+    <h2>📍 アクセス</h2>
+    <div class="map-address">
+      <strong>ぷりんやさん 2号店</strong><br>
+      〒158-0083 東京都世田谷区奥沢1丁目48−1
+    </div>
+    <iframe
+      class="map-frame"
+      src="https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E4%B8%96%E7%94%B0%E8%B0%B7%E5%8C%BA%E5%A5%A5%E6%B2%A21%E4%B8%81%E7%9B%AE48-1&output=embed&hl=ja&z=16"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+    <a class="map-link" href="https://maps.google.com/maps?q=東京都世田谷区奥沢1丁目48-1" target="_blank">
+      📱 Google マップで開く →
+    </a>
+  </div>
+
+</div>
+
+<!-- ギャラリー -->
 <div class="gallery-section">
   <h2>📸 キッチンのご紹介</h2>
   <p>清潔で本格的なキッチンをご利用いただけます</p>
@@ -359,9 +480,9 @@
   <div class="lightbox-caption" id="lightbox-caption"></div>
 </div>
 
+<!-- 予約フォーム -->
 <div class="container">
 
-  <!-- Step indicator -->
   <div class="steps">
     <div class="step active" id="step1-dot">1</div>
     <div class="step-line" id="line1"></div>
@@ -482,7 +603,25 @@
 
 </div>
 
+<div class="admin-link">
+  <a href="admin.html">🔧 管理画面</a>
+</div>
+
 <script>
+// ===== EmailJS設定 =====
+// ※ EmailJSアカウント取得後に以下を設定してください
+// https://www.emailjs.com/ で無料登録 → Service ID, Template ID, Public Key を取得
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+const OWNER_EMAIL = 'omata315@gmail.com';
+
+(function() {
+  if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+})();
+
 // ===== STATE =====
 let currentMonth, currentYear;
 let selectedDate = null;
@@ -499,10 +638,8 @@ currentYear = today.getFullYear();
 function renderCalendar() {
   const label = document.getElementById('month-label');
   label.textContent = `${currentYear}年 ${currentMonth + 1}月`;
-
   const grid = document.getElementById('calendar');
   grid.innerHTML = '';
-
   const dayLabels = ['日','月','火','水','木','金','土'];
   const classes = ['sun','','','','','','sat'];
   dayLabels.forEach((d, i) => {
@@ -511,28 +648,23 @@ function renderCalendar() {
     el.textContent = d;
     grid.appendChild(el);
   });
-
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
   for (let i = 0; i < firstDay; i++) {
     const el = document.createElement('div');
     el.className = 'day empty';
     grid.appendChild(el);
   }
-
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const dateStr = formatDate(date);
     const el = document.createElement('div');
     el.textContent = d;
-
     const isPast = date < today;
     const isToday = date.getTime() === today.getTime();
     const isSelected = selectedDate === dateStr;
     const dayBookings = bookings.filter(b => b.date === dateStr);
     const isFullyBooked = dayBookings.length >= 2;
-
     let cls = 'day';
     if (isPast) cls += ' past';
     else if (isFullyBooked) cls += ' fully-booked';
@@ -542,7 +674,6 @@ function renderCalendar() {
     }
     if (isToday) cls += ' today';
     if (isSelected) cls += ' selected';
-
     el.className = cls;
     grid.appendChild(el);
   }
@@ -588,25 +719,17 @@ function selectPlan(plan) {
 function renderTimeSlots() {
   const container = document.getElementById('time-slots');
   container.innerHTML = '';
-
   const dayBookings = bookings.filter(b => b.date === selectedDate);
   const bookedTimes = dayBookings.map(b => b.startTime);
-
-  let slots = [];
-  if (selectedPlan === 'half') {
-    slots = ['08:00', '09:00', '10:00', '13:00', '14:00'];
-  } else {
-    slots = ['08:00', '09:00', '10:00'];
-  }
-
+  let slots = selectedPlan === 'half'
+    ? ['08:00', '09:00', '10:00', '13:00', '14:00']
+    : ['08:00', '09:00', '10:00'];
   slots.forEach(slot => {
     const el = document.createElement('div');
     el.className = 'time-slot';
     const endHour = parseInt(slot) + (selectedPlan === 'half' ? 4 : 8);
     el.textContent = `${slot} 〜 ${String(endHour).padStart(2,'0')}:00`;
-
-    const isUnavailable = bookedTimes.includes(slot);
-    if (isUnavailable) {
+    if (bookedTimes.includes(slot)) {
       el.classList.add('unavailable');
     } else {
       el.onclick = () => selectTime(slot, el);
@@ -628,8 +751,6 @@ function goStep(n) {
     document.getElementById(id).classList.add('hidden');
   });
   document.getElementById('step' + n).classList.remove('hidden');
-
-  // Update dots
   for (let i = 1; i <= 4; i++) {
     const dot = document.getElementById('step' + i + '-dot');
     dot.className = 'step';
@@ -640,7 +761,6 @@ function goStep(n) {
       line.className = 'step-line' + (i < n ? ' done' : '');
     }
   }
-
   if (n === 4) fillSummary();
 }
 
@@ -655,7 +775,6 @@ function fillSummary() {
   const timeStr = `${selectedTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
   const planStr = selectedPlan === 'half' ? '半日（4時間）' : '1日（8時間）';
   const price = selectedPlan === 'half' ? '¥4,000' : '¥8,000';
-
   document.getElementById('sum-date').textContent = formatDateJP(selectedDate);
   document.getElementById('sum-plan').textContent = planStr;
   document.getElementById('sum-time').textContent = timeStr;
@@ -692,15 +811,27 @@ function submitBooking() {
   bookings.push(booking);
   localStorage.setItem('kitchen_bookings', JSON.stringify(bookings));
 
-  // Show success
+  // メール通知送信
+  if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: OWNER_EMAIL,
+      booking_date: formatDateJP(selectedDate),
+      booking_plan: planStr,
+      booking_time: timeStr,
+      booking_price: price,
+      customer_name: booking.name,
+      customer_phone: booking.phone,
+      customer_email: booking.email || 'なし',
+      customer_note: booking.note || 'なし'
+    }).catch(err => console.log('メール送信エラー:', err));
+  }
+
+  // SUCCESS表示
   document.getElementById('suc-date').textContent = formatDateJP(selectedDate);
   document.getElementById('suc-time').textContent = timeStr;
   document.getElementById('suc-price').textContent = price + '（現地払い）';
-
   ['step1','step2','step3','step4'].forEach(id => document.getElementById(id).classList.add('hidden'));
   document.getElementById('step-success').classList.remove('hidden');
-
-  // Update all dots to done
   for (let i = 1; i <= 4; i++) {
     document.getElementById('step' + i + '-dot').className = 'step done';
     if (i < 4) document.getElementById('line' + i).className = 'step-line done';
@@ -708,19 +839,15 @@ function submitBooking() {
 }
 
 function resetApp() {
-  selectedDate = null;
-  selectedPlan = null;
-  selectedTime = null;
+  selectedDate = null; selectedPlan = null; selectedTime = null;
   document.getElementById('input-name').value = '';
   document.getElementById('input-phone').value = '';
   document.getElementById('input-email').value = '';
   document.getElementById('input-note').value = '';
   goStep(1);
   renderCalendar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-// Init
-renderCalendar();
 
 // ===== LIGHTBOX =====
 function openLightbox(src, caption) {
@@ -733,6 +860,9 @@ function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+// Init
+renderCalendar();
 </script>
 </body>
 </html>

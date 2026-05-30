@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 | ぷりんやさん レンタルキッチン</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      background: #fff9f0;
+      color: #333;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #f9a825, #f06292);
+      color: white;
+      text-align: center;
+      padding: 20px 16px;
+    }
+    header h1 { font-size: 20px; margin-bottom: 4px; }
+    header p { font-size: 12px; opacity: 0.85; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .stat-card .stat-num {
+      font-size: 28px;
+      font-weight: bold;
+      color: #f06292;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-danger { background: #ffebee; color: #e53935; }
+    .btn-danger:hover { background: #e53935; color: white; }
+    .btn-export { background: #e8f5e9; color: #2e7d32; }
+    .btn-export:hover { background: #2e7d32; color: white; }
+    .btn-back { background: #f5f5f5; color: #666; }
+    .btn-back:hover { background: #eee; }
+
+    /* Filter */
+    .filter-bar {
+      background: white;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-bar label { font-size: 13px; color: #666; }
+    .filter-bar select, .filter-bar input {
+      border: 1.5px solid #eee;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    /* Booking cards */
+    .booking-card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-left: 4px solid #f9a825;
+      transition: all 0.2s;
+    }
+    .booking-card.past { border-left-color: #ddd; opacity: 0.7; }
+    .booking-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .booking-date { font-size: 16px; font-weight: bold; }
+    .booking-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    .badge-half { background: #fff3e0; color: #f9a825; }
+    .badge-full { background: #fce4ec; color: #f06292; }
+    .badge-past { background: #f5f5f5; color: #999; }
+    .booking-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .info-row { display: flex; gap: 6px; }
+    .info-label { color: #999; flex-shrink: 0; }
+    .info-value { font-weight: bold; color: #333; }
+    .booking-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #f5f5f5;
+    }
+    .booking-price { font-size: 18px; font-weight: bold; color: #f06292; }
+    .booking-id { font-size: 11px; color: #ccc; }
+    .btn-delete {
+      background: none;
+      border: 1px solid #ffcdd2;
+      color: #e57373;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-delete:hover { background: #ffebee; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    @media (max-width: 400px) {
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .stat-card .stat-num { font-size: 22px; }
+      .booking-info { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📋 予約管理画面</h1>
+  <p>ぷりんやさん レンタルキッチン</p>
+</header>
+
+<div class="container">
+
+  <!-- 統計 -->
+  <div class="stats" id="stats"></div>
+
+  <!-- コントロール -->
+  <div class="controls">
+    <a href="index.html"><button class="btn-sm btn-back">← 予約ページへ</button></a>
+    <button class="btn-sm btn-export" onclick="exportCSV()">📥 CSV書き出し</button>
+    <button class="btn-sm btn-danger" onclick="clearAll()">🗑 全件削除</button>
+  </div>
+
+  <!-- フィルター -->
+  <div class="filter-bar">
+    <label>表示：</label>
+    <select id="filter-period" onchange="renderBookings()">
+      <option value="all">すべて</option>
+      <option value="upcoming" selected>今後の予約</option>
+      <option value="past">過去の予約</option>
+    </select>
+    <select id="filter-plan" onchange="renderBookings()">
+      <option value="all">プラン：すべて</option>
+      <option value="half">半日のみ</option>
+      <option value="full">1日のみ</option>
+    </select>
+  </div>
+
+  <!-- 予約リスト -->
+  <div id="booking-list"></div>
+
+</div>
+
+<script>
+function getBookings() {
+  return JSON.parse(localStorage.getItem('kitchen_bookings') || '[]');
+}
+
+function saveBookings(bookings) {
+  localStorage.setItem('kitchen_bookings', JSON.stringify(bookings));
+}
+
+function formatDateJP(dateStr) {
+  const [y, m, d] = dateStr.split('-');
+  const date = new Date(y, m-1, d);
+  const days = ['日','月','火','水','木','金','土'];
+  return `${y}年${parseInt(m)}月${parseInt(d)}日（${days[date.getDay()]}）`;
+}
+
+function todayStr() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+
+function renderStats() {
+  const bookings = getBookings();
+  const today = todayStr();
+  const upcoming = bookings.filter(b => b.date >= today).length;
+  const past = bookings.filter(b => b.date < today).length;
+  const revenue = bookings.reduce((sum, b) => sum + (b.plan === 'half' ? 4000 : 8000), 0);
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num">${upcoming}</div>
+      <div class="stat-label">今後の予約</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${bookings.length}</div>
+      <div class="stat-label">総予約数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">¥${revenue.toLocaleString()}</div>
+      <div class="stat-label">累計売上</div>
+    </div>
+  `;
+}
+
+function renderBookings() {
+  const bookings = getBookings();
+  const today = todayStr();
+  const periodFilter = document.getElementById('filter-period').value;
+  const planFilter = document.getElementById('filter-plan').value;
+
+  let filtered = bookings.filter(b => {
+    if (periodFilter === 'upcoming' && b.date < today) return false;
+    if (periodFilter === 'past' && b.date >= today) return false;
+    if (planFilter !== 'all' && b.plan !== planFilter) return false;
+    return true;
+  });
+
+  // 日付でソート（新しい順）
+  filtered.sort((a, b) => a.date > b.date ? -1 : 1);
+
+  const list = document.getElementById('booking-list');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>該当する予約がありません</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const isPast = b.date < today;
+    const planStr = b.plan === 'half' ? '半日（4時間）' : '1日（8時間）';
+    const price = b.plan === 'half' ? '¥4,000' : '¥8,000';
+    const endHour = parseInt(b.startTime) + (b.plan === 'half' ? 4 : 8);
+    const timeStr = `${b.startTime} 〜 ${String(endHour).padStart(2,'0')}:00`;
+    const badgeClass = isPast ? 'badge-past' : (b.plan === 'half' ? 'badge-half' : 'badge-full');
+
+    return `
+      <div class="booking-card ${isPast ? 'past' : ''}">
+        <div class="booking-card-header">
+          <div class="booking-date">📅 ${formatDateJP(b.date)}</div>
+          <span class="booking-badge ${badgeClass}">${planStr}</span>
+        </div>
+        <div class="booking-info">
+          <div class="info-row">
+            <span class="info-label">🕐</span>
+            <span class="info-value">${timeStr}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">👤</span>
+            <span class="info-value">${b.name}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">📞</span>
+            <span class="info-value">${b.phone}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">📧</span>
+            <span class="info-value">${b.email || 'なし'}</span>
+          </div>
+          ${b.note ? `<div class="info-row" style="grid-column:span 2">
+            <span class="info-label">📝</span>
+            <span class="info-value">${b.note}</span>
+          </div>` : ''}
+        </div>
+        <div class="booking-footer">
+          <div>
+            <div class="booking-price">${price}</div>
+            <div class="booking-id">予約ID: ${b.id}</div>
+          </div>
+          <button class="btn-delete" onclick="deleteBooking(${b.id})">🗑 削除</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteBooking(id) {
+  if (!confirm('この予約を削除しますか？')) return;
+  const bookings = getBookings().filter(b => b.id !== id);
+  saveBookings(bookings);
+  renderStats();
+  renderBookings();
+}
+
+function clearAll() {
+  if (!confirm('全ての予約を削除しますか？\nこの操作は元に戻せません。')) return;
+  saveBookings([]);
+  renderStats();
+  renderBookings();
+}
+
+function exportCSV() {
+  const bookings = getBookings();
+  if (bookings.length === 0) { alert('予約データがありません'); return; }
+
+  const header = ['予約ID','日付','プラン','開始時間','お名前','電話番号','メール','備考','金額','予約日時'];
+  const rows = bookings.map(b => {
+    const price = b.plan === 'half' ? 4000 : 8000;
+    return [
+      b.id, b.date,
+      b.plan === 'half' ? '半日' : '1日',
+      b.startTime, b.name, b.phone,
+      b.email || '', b.note || '',
+      price,
+      new Date(b.createdAt).toLocaleString('ja-JP')
+    ].map(v => `"${v}"`).join(',');
+  });
+
+  const csv = '﻿' + [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `予約一覧_${new Date().toLocaleDateString('ja-JP').replace(/\//g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 初期表示
+renderStats();
+renderBookings();
+</script>
+</body>
+</html>
