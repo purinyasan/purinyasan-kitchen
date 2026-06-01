@@ -280,6 +280,79 @@
       line-height: 1.6;
     }
 
+    /* ===== Info Section ===== */
+    .info-section {
+      background: #fff9f0;
+      padding: 28px 16px;
+    }
+    .info-section h2 {
+      text-align: center;
+      font-size: 18px;
+      color: #f06292;
+      margin-bottom: 6px;
+    }
+    .info-section > p {
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+    .info-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .info-card h3 {
+      font-size: 15px;
+      color: #f9a825;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #fff3e0;
+    }
+    .label-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .label-table tr {
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .label-table td {
+      padding: 9px 6px;
+      vertical-align: top;
+    }
+    .label-table td:first-child {
+      color: #f06292;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 110px;
+    }
+    .label-table td:last-child {
+      color: #333;
+      line-height: 1.6;
+    }
+    .address-box {
+      background: #fff3e0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #333;
+      margin-top: 12px;
+      line-height: 1.8;
+    }
+    .address-box strong { color: #f06292; }
+    .note-box {
+      background: #fce4ec;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #c62828;
+      margin-top: 12px;
+      line-height: 1.7;
+    }
+
     /* ===== Gallery ===== */
     .gallery-section {
       background: white;
@@ -473,6 +546,65 @@
     <div class="gallery-item wide" onclick="openLightbox('images/IMG_2545.jpeg','💰 料金箱・各種キャッシュレス対応')">
       <img src="images/IMG_2545.jpeg" alt="料金箱">
       <div class="gallery-caption">💰 料金箱・PayPay / d払い / au PAY 対応</div>
+    </div>
+  </div>
+</div>
+
+<!-- ご利用案内 -->
+<div class="info-section">
+  <h2>📋 ご利用案内</h2>
+  <p>ネット販売・マルシェ出店などに役立つ情報です</p>
+
+  <div class="info-card">
+    <h3>🏭 製造所・製造者について</h3>
+    <p style="font-size:13px; color:#555; line-height:1.7; margin-bottom:12px;">
+      当キッチンをご利用でネット販売などをされる場合、<strong style="color:#f06292;">製造所はぷりんやさんの住所をご使用いただけます！</strong>
+    </p>
+    <div class="address-box">
+      <strong>製造所：</strong>〒158-0083 東京都世田谷区奥沢1丁目48-1<br>
+      <strong>製造者：</strong>ご本人のお名前
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🏷️ ネット販売で必要な食品表示</h3>
+    <p style="font-size:12px; color:#999; margin-bottom:12px;">食品表示法に基づき、以下の表示が必要です</p>
+    <table class="label-table">
+      <tr>
+        <td>名称</td>
+        <td>商品名（例：プリン、クッキーなど）</td>
+      </tr>
+      <tr>
+        <td>原材料名</td>
+        <td>使用した材料をすべて記載。アレルゲン（卵・乳・小麦など）は強調表示</td>
+      </tr>
+      <tr>
+        <td>内容量</td>
+        <td>個数・グラム数など（例：1個、100g）</td>
+      </tr>
+      <tr>
+        <td>消費期限</td>
+        <td>年月日を記載（生菓子・要冷蔵は必須）</td>
+      </tr>
+      <tr>
+        <td>保存方法</td>
+        <td>例：要冷蔵（10℃以下）、直射日光を避けて保存など</td>
+      </tr>
+      <tr>
+        <td>製造者</td>
+        <td>ご本人のお名前</td>
+      </tr>
+      <tr>
+        <td>製造所</td>
+        <td>〒158-0083 東京都世田谷区奥沢1丁目48-1</td>
+      </tr>
+      <tr>
+        <td>アレルゲン</td>
+        <td>該当するものを記載（卵・乳・小麦・えび・かになど）</td>
+      </tr>
+    </table>
+    <div class="note-box">
+      ⚠️ 食品をネット販売するには「食品衛生責任者」の資格と「営業許可（菓子製造業など）」が必要な場合があります。管轄の保健所にご確認ください。
     </div>
   </div>
 </div>
